@@ -45,7 +45,9 @@ class BioSignalProcessor:
             raise ValueError("num_samples must be positive")
 
         b = self.baseline
-        timestamps = [start_time + timedelta(minutes=i * interval_minutes) for i in range(num_samples)]
+        timestamps = [
+            start_time + timedelta(minutes=i * interval_minutes) for i in range(num_samples)
+        ]
 
         # Mild circadian modulation so a full-day series doesn't look flat:
         # lower heart rate overnight, a touch higher through the day.
@@ -77,7 +79,9 @@ class BioSignalProcessor:
             raise ValueError("num_samples must be positive")
 
         b = self.baseline
-        timestamps = [start_time + timedelta(minutes=i * interval_minutes) for i in range(num_samples)]
+        timestamps = [
+            start_time + timedelta(minutes=i * interval_minutes) for i in range(num_samples)
+        ]
         hrv = self.rng.normal(b.hrv_mean_ms, b.hrv_std_ms, num_samples)
         hrv = np.clip(hrv, b.hrv_min_ms, b.hrv_max_ms)
         return pd.DataFrame({"timestamp": timestamps, "hrv_ms": hrv})

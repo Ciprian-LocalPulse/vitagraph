@@ -25,7 +25,9 @@ def test_generate_raises_on_non_positive_samples(
         cohort_generator.generate(num_samples=bad_value)
 
 
-def test_biological_age_stays_within_clipped_bounds(cohort_generator: SyntheticCohortGenerator) -> None:
+def test_biological_age_stays_within_clipped_bounds(
+    cohort_generator: SyntheticCohortGenerator,
+) -> None:
     df = cohort_generator.generate(num_samples=500)
     max_dev = cohort_generator.formula.max_deviation_years
     assert (df["biological_age"] >= df["chronological_age"] - max_dev).all()

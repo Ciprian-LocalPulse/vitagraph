@@ -48,10 +48,13 @@ def recommend_focus_area(row: pd.Series, baseline: SignalBaseline) -> tuple[str,
         (focus_area_label, rationale) tuple.
     """
     deviations = {
-        "heart_rate_avg": (row["heart_rate_avg"] - baseline.heart_rate_mean) / baseline.heart_rate_std,
+        "heart_rate_avg": (row["heart_rate_avg"] - baseline.heart_rate_mean)
+        / baseline.heart_rate_std,
         "hrv_avg": (baseline.hrv_mean_ms - row["hrv_avg"]) / baseline.hrv_std_ms,
-        "sleep_hours_avg": (baseline.sleep_hours_mean - row["sleep_hours_avg"]) / baseline.sleep_hours_std,
-        "activity_level": (baseline.activity_level_mean - row["activity_level"]) / baseline.activity_level_std,
+        "sleep_hours_avg": (baseline.sleep_hours_mean - row["sleep_hours_avg"])
+        / baseline.sleep_hours_std,
+        "activity_level": (baseline.activity_level_mean - row["activity_level"])
+        / baseline.activity_level_std,
         "environmental_exposure": (
             (row["environmental_exposure"] - baseline.environmental_exposure_mean)
             / baseline.environmental_exposure_std
@@ -127,7 +130,9 @@ def run_pipeline(
         hr_raw = processor.generate_synthetic_heart_rate(num_hr, start_time)
         hrv_raw = processor.generate_synthetic_hrv(num_hr, start_time)
         sleep_raw = processor.generate_synthetic_sleep_data(cfg.num_sleep_days, start_time.date())
-        env_raw = processor.generate_synthetic_environmental_exposure(cfg.num_sleep_days, start_time.date())
+        env_raw = processor.generate_synthetic_environmental_exposure(
+            cfg.num_sleep_days, start_time.date()
+        )
 
         hr_processed = processor.process_biometric_data(hr_raw, "heart_rate")
         hrv_processed = processor.process_biometric_data(hrv_raw, "hrv_ms")
@@ -137,7 +142,9 @@ def run_pipeline(
 
         env_value = float(env_raw["environmental_exposure"].mean())
         env_id = f"Env_{person_id}"
-        kg.add_environmental_factor_node(env_id, "EnvironmentalExposureIndex", env_value, start_time)
+        kg.add_environmental_factor_node(
+            env_id, "EnvironmentalExposureIndex", env_value, start_time
+        )
         kg.link_person_to_environmental_factor(person_id, env_id, "EXPOSED_TO")
 
         activity_level = float(
@@ -157,7 +164,9 @@ def run_pipeline(
             }
         )
         logger.info(
-            "Built knowledge graph for %s (%d total nodes so far)", person_id, kg.graph.number_of_nodes()
+            "Built knowledge graph for %s (%d total nodes so far)",
+            person_id,
+            kg.graph.number_of_nodes(),
         )
 
     individuals_df = pd.DataFrame.from_records(records)
@@ -168,7 +177,9 @@ def run_pipeline(
     cohort = cohort_gen.generate(num_samples=cfg.training_samples)
 
     X, y = cohort[FEATURE_COLUMNS], cohort[TARGET_COLUMN]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=cfg.random_seed)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=cfg.random_seed
+    )
 
     estimator = BioAgeEstimator(model_type=cfg.model_type)
     cv_scores = estimator.cross_validate(X_train, y_train, cv=cfg.cv_folds)
@@ -185,7 +196,9 @@ def run_pipeline(
     for _, row in individuals_df.iterrows():
         focus_area, rationale = recommend_focus_area(row, baseline)
         intervention_id = f"Intervention_{row['person_id']}"
-        kg.add_intervention_node(intervention_id, row["person_id"], focus_area, rationale, datetime.now())
+        kg.add_intervention_node(
+            intervention_id, row["person_id"], focus_area, rationale, datetime.now()
+        )
 
     model_path: Path | None = None
     if output_path is not None:

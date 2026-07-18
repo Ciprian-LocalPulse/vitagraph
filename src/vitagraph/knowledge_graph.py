@@ -168,7 +168,9 @@ class KnowledgeGraph:
         """
         if not self.graph.has_node(person_id):
             raise GraphNodeNotFoundError(f"Person node '{person_id}' not found in graph")
-        neighbor_ids = set(self.graph.successors(person_id)) | set(self.graph.predecessors(person_id))
+        neighbor_ids = set(self.graph.successors(person_id)) | set(
+            self.graph.predecessors(person_id)
+        )
         node_ids = {person_id} | neighbor_ids
         return self.graph.subgraph(node_ids).copy()
 

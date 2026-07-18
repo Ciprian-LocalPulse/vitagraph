@@ -20,7 +20,9 @@ def test_add_person_node_is_idempotent(empty_graph: KnowledgeGraph) -> None:
     assert empty_graph.graph.nodes["P001"]["type"] == "Person"
 
 
-def test_add_biometric_data_node_links_edge(empty_graph: KnowledgeGraph, start_time: datetime) -> None:
+def test_add_biometric_data_node_links_edge(
+    empty_graph: KnowledgeGraph, start_time: datetime
+) -> None:
     empty_graph.add_person_node("P001")
     empty_graph.add_biometric_data_node("HR_1", "P001", "HeartRate", 72, start_time)
     assert empty_graph.graph.number_of_edges() == 1
@@ -53,7 +55,9 @@ def test_get_graph_info_edge_relations(empty_graph: KnowledgeGraph, start_time: 
 
 def test_add_intervention_node(empty_graph: KnowledgeGraph, start_time: datetime) -> None:
     empty_graph.add_person_node("P001")
-    empty_graph.add_intervention_node("Intervention_P001", "P001", "sleep", "low sleep z-score", start_time)
+    empty_graph.add_intervention_node(
+        "Intervention_P001", "P001", "sleep", "low sleep z-score", start_time
+    )
     assert empty_graph.graph.nodes["Intervention_P001"]["type"] == "Intervention"
     assert empty_graph.graph.edges["P001", "Intervention_P001"]["relation"] == "HAS_RECOMMENDATION"
 
@@ -71,7 +75,9 @@ def test_get_subgraph_raises_for_unknown_person(empty_graph: KnowledgeGraph) -> 
         empty_graph.get_subgraph_for_person("does-not-exist")
 
 
-def test_export_to_json_round_trip(empty_graph: KnowledgeGraph, start_time: datetime, tmp_path: Path) -> None:
+def test_export_to_json_round_trip(
+    empty_graph: KnowledgeGraph, start_time: datetime, tmp_path: Path
+) -> None:
     empty_graph.add_person_node("P001")
     empty_graph.add_biometric_data_node("HR_1", "P001", "HeartRate", 72, start_time)
 
@@ -84,7 +90,9 @@ def test_export_to_json_round_trip(empty_graph: KnowledgeGraph, start_time: date
     assert len(data["nodes"]) == 2
 
 
-def test_export_to_graphml_is_readable(empty_graph: KnowledgeGraph, start_time: datetime, tmp_path: Path) -> None:
+def test_export_to_graphml_is_readable(
+    empty_graph: KnowledgeGraph, start_time: datetime, tmp_path: Path
+) -> None:
     empty_graph.add_person_node("P001")
     empty_graph.add_biometric_data_node("HR_1", "P001", "HeartRate", 72, start_time)
 

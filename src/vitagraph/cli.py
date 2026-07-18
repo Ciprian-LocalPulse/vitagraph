@@ -34,21 +34,29 @@ _DISCLAIMER = (
 
 
 def _build_parser() -> ArgumentParser:
-    parser = ArgumentParser(prog="vitagraph", description="VitaGraph synthetic-data research pipeline CLI")
+    parser = ArgumentParser(
+        prog="vitagraph", description="VitaGraph synthetic-data research pipeline CLI"
+    )
     parser.add_argument("--version", action="version", version=f"vitagraph {__version__}")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    run_p = subparsers.add_parser("run", help="Run the full simulate -> graph -> train -> predict pipeline")
+    run_p = subparsers.add_parser(
+        "run", help="Run the full simulate -> graph -> train -> predict pipeline"
+    )
     run_p.add_argument("--individuals", type=int, default=PipelineDefaults.num_individuals)
     run_p.add_argument("--days", type=int, default=PipelineDefaults.num_sleep_days)
-    run_p.add_argument("--hr-samples-per-day", type=int, default=PipelineDefaults.num_hr_samples_per_day)
+    run_p.add_argument(
+        "--hr-samples-per-day", type=int, default=PipelineDefaults.num_hr_samples_per_day
+    )
     run_p.add_argument("--training-samples", type=int, default=PipelineDefaults.training_samples)
     run_p.add_argument("--model", choices=_MODEL_CHOICES, default=PipelineDefaults.model_type)
     run_p.add_argument("--seed", type=int, default=PipelineDefaults.random_seed)
     run_p.add_argument("--cv-folds", type=int, default=PipelineDefaults.cv_folds)
     run_p.add_argument("--output-dir", type=Path, default=None)
 
-    train_p = subparsers.add_parser("train", help="Train (and save) a model on synthetic cohort data only")
+    train_p = subparsers.add_parser(
+        "train", help="Train (and save) a model on synthetic cohort data only"
+    )
     train_p.add_argument("--samples", type=int, default=PipelineDefaults.training_samples)
     train_p.add_argument("--model", choices=_MODEL_CHOICES, default=PipelineDefaults.model_type)
     train_p.add_argument("--seed", type=int, default=PipelineDefaults.random_seed)

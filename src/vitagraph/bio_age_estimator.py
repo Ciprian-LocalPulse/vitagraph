@@ -107,7 +107,7 @@ class BioAgeEstimator:
     # ------------------------------------------------------------------ #
     # Training / inference
     # ------------------------------------------------------------------ #
-    def train(self, X_train: pd.DataFrame, y_train: pd.Series) -> "BioAgeEstimator":
+    def train(self, X_train: pd.DataFrame, y_train: pd.Series) -> BioAgeEstimator:
         """Fits the model on training data. Returns self for chaining."""
         self._validate_columns(X_train)
         logger.info(
@@ -137,9 +137,13 @@ class BioAgeEstimator:
         mae = mean_absolute_error(y_test, predictions)
         rmse = mean_squared_error(y_test, predictions) ** 0.5
         r2 = r2_score(y_test, predictions)
-        metrics = EvaluationMetrics(mae=round(float(mae), 4), rmse=round(float(rmse), 4), r2=round(float(r2), 4))
+        metrics = EvaluationMetrics(
+            mae=round(float(mae), 4), rmse=round(float(rmse), 4), r2=round(float(r2), 4)
+        )
         self._last_metrics = metrics
-        logger.info("Evaluation — MAE: %.2f  RMSE: %.2f  R²: %.3f", metrics.mae, metrics.rmse, metrics.r2)
+        logger.info(
+            "Evaluation — MAE: %.2f  RMSE: %.2f  R²: %.3f", metrics.mae, metrics.rmse, metrics.r2
+        )
         return metrics
 
     def cross_validate(self, X: pd.DataFrame, y: pd.Series, cv: int = 5) -> dict[str, float]:
@@ -192,7 +196,9 @@ class BioAgeEstimator:
         else:  # pragma: no cover - defensive fallback for future model types
             raise NotImplementedError(f"{self.model_type} does not expose feature importances")
 
-        return dict(sorted(zip(self.features, (float(v) for v in raw)), key=lambda kv: -kv[1]))
+        return dict(
+            sorted(zip(self.features, (float(v) for v in raw), strict=False), key=lambda kv: -kv[1])
+        )
 
     # ------------------------------------------------------------------ #
     # Persistence
@@ -222,7 +228,7 @@ class BioAgeEstimator:
         logger.info("Saved model to %s (+ metadata at %s)", path, metadata_path)
         return path
 
-    def load_model(self, path: str | Path) -> "BioAgeEstimator":
+    def load_model(self, path: str | Path) -> BioAgeEstimator:
         """Loads a trained model from disk. Also loads the metadata sidecar if present."""
         path = Path(path)
         self.model = joblib.load(path)
