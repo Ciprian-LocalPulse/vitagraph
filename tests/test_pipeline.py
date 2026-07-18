@@ -31,7 +31,7 @@ def test_run_pipeline_writes_artifacts(tmp_path: Path) -> None:
         num_sleep_days=3,
         training_samples=30,
     )
-    result = run_pipeline(config=config, output_dir=tmp_path)
+    run_pipeline(config=config, output_dir=tmp_path)
 
     assert (tmp_path / "models" / "bio_age_model.joblib").exists()
     assert (tmp_path / "models" / "bio_age_model.json").exists()
