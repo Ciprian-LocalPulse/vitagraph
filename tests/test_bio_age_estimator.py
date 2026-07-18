@@ -43,7 +43,6 @@ def test_missing_columns_raises(cohort_generator) -> None:
     y = df["biological_age"]
 
     estimator = BioAgeEstimator()
-    
     # Validarea coloanelor se face direct în timpul metodei de train()
     with pytest.raises(MissingFeatureColumnsError):
         estimator.train(X_bad, y)
