@@ -1,0 +1,90 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vitagraph"
+version = "0.2.0"
+description = "Open-source reference framework for simulating bio-signal knowledge graphs and biological-age estimation on synthetic data."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Ciprian Stefan Plesca" }
+]
+keywords = [
+    "health-data-science",
+    "knowledge-graph",
+    "biological-age",
+    "longevity",
+    "synthetic-data",
+    "research",
+    "reference-implementation",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "networkx>=3.0",
+    "scikit-learn>=1.2.0",
+    "joblib>=1.2.0",
+    "matplotlib>=3.7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.4.0",
+    "black>=24.0.0",
+    "mypy>=1.8.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Ciprian-LocalPulse/vitagraph"
+Issues = "https://github.com/Ciprian-LocalPulse/vitagraph/issues"
+Changelog = "https://github.com/Ciprian-LocalPulse/vitagraph/blob/main/CHANGELOG.md"
+
+[project.scripts]
+vitagraph = "vitagraph.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q --cov=vitagraph --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["src/vitagraph"]

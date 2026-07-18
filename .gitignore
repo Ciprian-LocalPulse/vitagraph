@@ -1,0 +1,39 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Coverage / test reports
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Trained model artifacts and pipeline run outputs (regenerated, not versioned)
+models/*.joblib
+models/*.json
+!models/README.md
+outputs/
+
+# OS / editor cruft
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Environment variables
+.env
