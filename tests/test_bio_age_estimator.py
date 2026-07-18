@@ -7,7 +7,11 @@ from pathlib import Path
 import pytest
 
 from vitagraph.bio_age_estimator import BioAgeEstimator
-from vitagraph.exceptions import InvalidModelTypeError, MissingFeatureColumnsError, ModelNotTrainedError
+from vitagraph.exceptions import (
+    InvalidModelTypeError,
+    MissingFeatureColumnsError,
+    ModelNotTrainedError,
+)
 from vitagraph.synthetic_data import FEATURE_COLUMNS
 
 
