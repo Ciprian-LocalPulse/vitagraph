@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from vitagraph.config import PipelineDefaults
 from vitagraph.pipeline import run_pipeline
 
@@ -52,9 +50,7 @@ def test_run_pipeline_individuals_have_interventions() -> None:
     subgraph = result.knowledge_graph.get_subgraph_for_person(person_id)
 
     intervention_nodes = [
-        n
-        for n, d in subgraph.nodes(data=True)
-        if d.get("type") == "Intervention"
+        n for n, d in subgraph.nodes(data=True) if d.get("type") == "Intervention"
     ]
     assert len(intervention_nodes) >= 1
 
