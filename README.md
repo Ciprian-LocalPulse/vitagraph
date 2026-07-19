@@ -13,13 +13,13 @@
 [![codecov](https://codecov.io/gh/Ciprian-LocalPulse/vitagraph/branch/main/graph/badge.svg)](https://codecov.io/gh/Ciprian-LocalPulse/vitagraph)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![PyPI](https://img.shields.io/pypi/v/vitagraph.svg)](https://pypi.org/project/vitagraph/)
-[![Downloads](https://static.pepy.tech/badge/vitagraph)](https://pepy.tech/project/vitagraph)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.PLACEHOLDER.svg)](https://doi.org/10.5281/zenodo.PLACEHOLDER)
+[![PyPI](https://img.shields.io/badge/PyPI-not%20yet%20published-lightgrey)](#-releases--versioning)
+[![Downloads](https://img.shields.io/badge/Downloads-pending%20PyPI%20release-lightgrey)](#-releases--versioning)
+[![DOI](https://img.shields.io/badge/DOI-pending%20Zenodo%20archive-lightgrey)](#-citation)
 [![Donate](https://img.shields.io/badge/💝-Support%20Research-ff69b4)](DONATE.md)
 [![GitHub](https://img.shields.io/badge/github-vitagraph-181717?logo=github)](https://github.com/Ciprian-LocalPulse/vitagraph)
 
-<sub>PyPI, Downloads, and DOI badges will resolve once the first `v0.2.0` tag is published (see [Releases](#-releases--versioning) and [Citation & DOI](#-citation)); CI/CodeQL/Docs/coverage badges are live against this repository.</sub>
+<sub>This project has not yet published a `v0.2.0` release: the PyPI, Downloads, and DOI badges above intentionally point to the in-repo [Releases](#-releases--versioning) and [Citation](#-citation) sections rather than to `pypi.org`, `pepy.tech`, or `doi.org` — those external pages will 404 until the first tagged release is published and Zenodo archiving runs (see those sections for the exact trigger). CI/CodeQL/Docs/coverage badges are live against this repository right now.</sub>
 
 ---
 
