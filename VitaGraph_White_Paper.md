@@ -1,8 +1,112 @@
----
-title: "VitaGraph: A Reference Framework for Bio-Signal Knowledge Graphs and Synthetic Biological-Age Estimation"
-author: "Ciprian Stefan Plesca"
-date: "2026"
----
+<div class="title-block">
+
+# VitaGraph
+<div class="subtitle">A Reference Framework for Bio-Signal Knowledge Graphs and Synthetic Biological-Age Estimation</div>
+<div class="meta">
+Version 0.2.0 &nbsp;|&nbsp; 2026 &nbsp;|&nbsp; MIT License<br/>
+Ciprian Stefan Plesca — Independent Researcher<br/>
+<a href="https://github.com/Ciprian-LocalPulse/vitagraph">github.com/Ciprian-LocalPulse/vitagraph</a>
+</div>
+</div>
+
+## Executive Summary
+
+VitaGraph is an MIT-licensed, open-source reference implementation that
+answers a narrow but recurring engineering question in digital-health
+research: *what does a complete, end-to-end pipeline for wearable-derived
+"biological age" estimation actually look like, architecturally, when
+every assumption is documented and every input is reproducible?*
+
+The project deliberately avoids the two obstacles that most commonly
+stall work in this space — restricted access to real clinical data, and
+tightly coupled codebases that make architecture hard to study
+independently of data provenance — by building the **entire** pipeline
+on seeded, synthetic data: raw wearable-style time series, a
+knowledge-graph representation of person/data/environment relationships,
+a pluggable regression layer, a transparent rule-based recommendation
+heuristic, and multi-format export (JSON, GraphML, joblib, CSV).
+
+Three things distinguish this document and the codebase it describes
+from a typical demo repository:
+
+1. **Auditability.** Every population-level constant and every formula
+   coefficient lives in one documented module (`vitagraph.config`), not
+   scattered as magic numbers through the code.
+2. **Formal treatment.** The pipeline is given precise mathematical
+   notation (§3), pseudocode for its three non-trivial algorithms (§6),
+   and an explicit, four-category threats-to-validity analysis (§8) —
+   construct, internal, external, and reliability — in the tradition of
+   empirical software-engineering methodology, rather than only a
+   narrative description.
+3. **Explicit scope statements.** The paper states, repeatedly and in
+   the first paragraph of every relevant section, what each synthetic
+   number does and does not represent — most importantly, that the
+   `biological_age` label is a generated convenience for a
+   supervised-learning demonstration, not a clinical measurement.
+4. **Production-grade engineering hygiene**, applied to a *research*
+   artifact: CI across three operating systems and three Python
+   versions, static analysis (ruff/black/mypy), security scanning
+   (CodeQL, Dependabot, dependency review), automated PyPI/GitHub
+   releases, a documentation site built from docstrings, and citation
+   metadata suitable for academic reuse (`CITATION.cff`, Zenodo
+   archiving).
+
+The intended audience is threefold: **researchers** deciding whether
+this is a useful architectural scaffold to adapt once real, properly
+licensed and IRB-approved data becomes available; **educators** seeking
+a fully worked, inspectable example of a health-data-science pipeline
+for teaching; and **engineers** assessing the codebase for reuse. The
+paper closes with a candid limitations section (§11) and a roadmap for
+the specific, non-trivial work required to move from this synthetic
+reference implementation to a real-data research system.
+
+## Table of Contents
+
+1. Introduction
+   1.1 Motivation
+   1.2 What VitaGraph Is
+   1.3 What VitaGraph Is Not
+2. Related Work and Positioning
+3. Formal Problem Statement and Notation
+   3.1 Feature Space and Label
+   3.2 Knowledge-Graph Formalism
+   3.3 Pipeline as a Function Composition
+   3.4 Complexity
+4. System Architecture
+   4.1 Pipeline Overview
+   4.2 Design Principles
+   4.3 Package Layout
+5. Methodology
+   5.1 Synthetic Raw Time-Series Generation
+   5.2 Synthetic Tabular Cohort Generation
+   5.3 The Synthetic Biological-Age Label
+   5.4 Model Training and Evaluation
+   5.5 Knowledge-Graph Construction
+   5.6 Rule-Based Intervention Suggestion
+   5.7 Visualization and Export
+6. Algorithms
+7. Experimental Validation and Statistical Rigor
+   7.1 Experimental Setup
+   7.2 Point Estimates
+   7.3 Variance Across Independent Synthetic Draws
+   7.4 Ablation: Feature Importance
+   7.5 What These Experiments Do Not Establish
+8. Threats to Validity
+   8.1 Construct Validity
+   8.2 Internal Validity
+   8.3 External Validity
+   8.4 Reliability (Reproducibility)
+9. Reproducibility and Engineering Practices
+10. Ethical and Privacy Considerations
+11. Limitations and Future Work
+12. Conclusion
+Appendix A — Reproducing the Results in This Paper
+Appendix B — Glossary
+Appendix C — References and Further Reading
+Appendix D — Validation & Benchmark Data
+Appendix E — Frequently Asked Questions
+Appendix F — Governance, Licensing, and Contribution Model
+Appendix G — Notation Reference
 
 # Abstract
 
@@ -25,6 +129,11 @@ assessing the codebase for reuse or extension. Throughout, we are
 explicit about what the software does and does not claim: **VitaGraph
 is a research and education tool, not a medical device, and none of its
 outputs represent real biological age or health status.**
+
+**Keywords:** knowledge graphs; synthetic data generation; biological
+age estimation; digital health informatics; reproducible research
+software; health-data pipeline architecture; rule-based recommendation
+systems; open-source scientific software.
 
 ---
 
@@ -96,13 +205,13 @@ VitaGraph is **not**:
 - A source of real biological-age measurement. The `biological_age`
   label used throughout the codebase is generated by a documented,
   deterministic formula over the same synthetic features used to
-  predict it (see §4.3) — it is a data-generation convenience for
+  predict it (see §5.3) — it is a data-generation convenience for
   producing a learnable supervised-learning target, not a scientific
   claim about aging biology.
 - A causal-inference system. The "Intervention Suggestion" stage
-  (§4.5) is a transparent, rule-based heuristic (largest standardized
+  (§5.5) is a transparent, rule-based heuristic (largest standardized
   deviation from a population baseline), explicitly **not** the output
-  of a causal model. We return to this distinction in §6 and §7.
+  of a causal model. We return to this distinction in §10 and §11.
 - Trained or validated on any real clinical cohort. No accuracy,
   precision, sensitivity, or other performance claim in this document
   or the codebase should be read as applying to real biological aging.
@@ -118,7 +227,7 @@ recent "epigenetic clocks" built from DNA methylation data, to
 wearable-derived indices built from heart rate, HRV, sleep, and
 activity. VitaGraph does not implement or reproduce any specific
 published biological-age algorithm; instead, it implements a
-**generic, documented placeholder formula** (§4.3) whose only purpose
+**generic, documented placeholder formula** (§5.3) whose only purpose
 is to produce a plausible, learnable regression target for
 demonstrating the rest of the pipeline.
 
@@ -143,9 +252,104 @@ be traced back to a documented formula or a seeded random draw.
 
 ---
 
-# 3. System Architecture
+# 3. Formal Problem Statement and Notation
 
-## 3.1 Pipeline overview
+This section fixes notation used throughout the remainder of the paper.
+Formalizing the pipeline — even one built on synthetic data — clarifies
+exactly which quantities are random variables, which are deterministic
+functions of them, and where the knowledge-graph and tabular views of
+the same underlying population diverge.
+
+## 3.1 Feature space and label
+
+Let **x** = (*a, h, v, s, l, e*) ∈ ℝ⁶ denote the feature vector for one
+synthetic individual, where:
+
+- *a* = chronological age (years), *a* ~ Uniform[20, 70)
+- *h* = mean heart rate (bpm), *h* ~ Normal(μ=70, σ=8)
+- *v* = mean HRV (ms), *v* ~ Normal(μ=55, σ=12)
+- *s* = mean sleep duration (h), *s* ~ Normal(μ=7.5, σ=1.0)
+- *l* = activity level, *l* ∈ [0, 1]
+- *e* = environmental exposure index, *e* ~ Normal(μ=0.4, σ=0.2)
+
+each independently drawn (§5.2). The synthetic label
+*y* = *f*θ(**x**) + *ε* is a fixed affine function *f*θ of **x** with
+documented coefficients *θ* (§5.3, Appendix G), plus Gaussian noise
+*ε* ~ Normal(0, 2.0), clipped to [*a* − 12, *a* + 12]. The
+supervised-learning task VitaGraph demonstrates is estimating an
+estimator *f̂*: ℝ⁶ → ℝ such that *f̂*(**x**) ≈ *y* over a held-out
+sample — i.e., recovering a *known, documented* generating function,
+not discovering an unknown biological relationship.
+
+## 3.2 Knowledge-graph formalism
+
+The knowledge graph is a directed, edge-labeled, attributed graph
+*G* = (*V*, *E*, *τ*, *λ*) where:
+
+- *V* = *V*ₚ ∪ *V*ᵦ ∪ *V*_F ∪ *V*ᵢ is the node set, partitioned into
+  **P**erson, **B**iometric-data, environmental-**F**actor, and
+  **I**ntervention nodes;
+- *E* ⊆ *V* × *V* is the edge set;
+- *τ*: *V* → {`Person`, `BiometricData`, `EnvironmentalFactor`,
+  `Intervention`} is a node-typing function;
+- *λ*: *E* → {`HAS_DATA`, `EXPOSED_TO`, `HAS_RECOMMENDATION`} is an
+  edge-labeling function.
+
+For a person *p* ∈ *V*ₚ, `build_from_processed_data` constructs one
+node *b*ᵢ ∈ *V*ᵦ per processed biometric reading and one edge
+(*p*, *b*ᵢ) ∈ *E* with *λ*((*p*,*b*ᵢ)) = `HAS_DATA`, for
+*i* = 1, …, *k* where *k* is the number of readings passed in. The
+induced subgraph used for visualization is *G*[{*p*} ∪ *N*(*p*)], the
+subgraph on *p* and its open neighborhood *N*(*p*).
+
+## 3.3 Pipeline as a function composition
+
+Writing 𝒟 for a per-person time-series tuple (heart rate, HRV, sleep,
+environmental exposure) and 𝒞 for a tabular cohort of *n* rows, the
+full pipeline is the composition:
+
+> **run_pipeline = Export ∘ Intervene ∘ ( Graph(𝒟) , *f̂*(Cohort(𝒞)) )**
+
+where **Graph**: 𝒟 → *G* builds the knowledge graph (§3.2), *f̂*: 𝒞 →
+(*f̂*, metrics) trains and evaluates the estimator (§5.4), **Intervene**:
+*G* × *f̂* → *G′* attaches intervention nodes (§5.6), and **Export**
+serializes *G′* and *f̂* to disk (§5.7). This factoring is the formal
+counterpart of the architecture diagram in §4.1: the graph branch and
+the tabular-model branch are independent until the intervention step,
+which is the only point where a trained model's output is written back
+onto the graph.
+
+## 3.4 Complexity
+
+Let *n* be the number of synthetic cohort rows and *m* the number of
+per-person time-series readings for *k* simulated individuals over *d*
+days. Table 1 summarizes the asymptotic cost of each stage as
+implemented (not a claim about the best achievable complexity for this
+task, only about the current implementation):
+
+**Table 1 — Asymptotic complexity by pipeline stage.**
+
+| Stage | Time | Space | Dominant operation |
+| --- | --- | --- | --- |
+| Synthetic cohort generation | O(*n*) | O(*n*) | Vectorized `numpy` sampling |
+| Signal generation (per person) | O(*m*) | O(*m*) | Vectorized `numpy` sampling |
+| Signal processing | O(*m*) | O(*m*) | Rolling-window mean, fixed window |
+| Graph construction | O(*k*·*m*) | O(*k*·*m*) | One node/edge per reading, per person |
+| Linear model training | O(*n*·*d*f²) | O(*n*·*d*f) | Ordinary least squares, *d*f = 6 features |
+| Random forest / GB training | O(*T*·*n* log *n*) | O(*T*·*n*) | *T* trees, standard decision-tree induction |
+| Prediction (any backend) | O(*n′*) – O(*n′*·*T* log *n*) | O(*n′*) | *n′* = inference rows |
+| GraphML / JSON export | O(\|*V*\| + \|*E*\|) | O(\|*V*\| + \|*E*\|) | Full graph serialization |
+
+Because *d*f = 6 is small and fixed, and *T* (200 by default) is a
+constant hyperparameter, all stages are linear in their respective
+input sizes for realistic use — consistent with the empirical
+benchmarks in `benchmarks/README.md` and §7.
+
+---
+
+# 4. System Architecture
+
+## 4.1 Pipeline overview
 
 VitaGraph's pipeline has seven conceptual stages:
 
@@ -189,7 +393,7 @@ source). Wearables → Signal Processing → Knowledge Graph → ML Estimator
 the ML Estimator on a separate, larger-scale synthetic dataset than the
 per-person graph construction path.
 
-## 3.2 Design principles
+## 4.2 Design principles
 
 **Every random draw is seeded.** All generator classes accept a `seed`
 parameter (default 42), and any pipeline run is exactly reproducible
@@ -220,7 +424,7 @@ mistaken for a real-data claim states, in the first paragraph, that its
 data is synthetic. The CLI prints a disclaimer after every `run`,
 `train`, and `predict` invocation. This is a project-wide convention.
 
-## 3.3 Package layout
+## 4.3 Package layout
 
 ```
 src/vitagraph/
@@ -245,13 +449,13 @@ not considered a breaking change.
 
 ---
 
-# 4. Methodology
+# 5. Methodology
 
 This section is the technical core of the white paper: precisely what
 each stage computes, and — critically — what it does and does not
 represent.
 
-## 4.1 Synthetic raw time-series generation
+## 5.1 Synthetic raw time-series generation
 
 `BioSignalProcessor` generates three raw time series per person:
 
@@ -276,7 +480,7 @@ pipeline (most real ingestion pipelines require *some* de-noising step
 before analysis); it is not a claim about optimal signal-processing
 technique for any specific real sensor.
 
-## 4.2 Synthetic tabular cohort generation
+## 5.2 Synthetic tabular cohort generation
 
 Independent of the per-person time series above, `SyntheticCohortGenerator`
 produces a **tabular** dataset for model training at population scale.
@@ -293,7 +497,7 @@ the *graph* demonstration, and a large, flat tabular dataset for the
 time series and derived per-person summary features are handled by
 different parts of a pipeline.
 
-## 4.3 The synthetic biological-age label
+## 5.3 The synthetic biological-age label
 
 The `biological_age` target is computed by a fully documented,
 deterministic formula (implemented in `SyntheticCohortGenerator.generate`,
@@ -323,7 +527,7 @@ published biological-age or epigenetic-clock algorithm, and it should
 not be cited as evidence for which lifestyle factors causally affect
 biological aging in reality.
 
-## 4.4 Model training and evaluation
+## 5.4 Model training and evaluation
 
 `BioAgeEstimator` wraps three scikit-learn regressors behind a common
 interface: `LinearRegression`, `RandomForestRegressor` (200 estimators,
@@ -347,7 +551,7 @@ depth 3), the last being the CLI default. The class provides:
   timestamp, and the most recent evaluation metrics, for reproducible
   provenance across model versions.
 
-Because the label in §4.3 is generated from a documented, largely
+Because the label in §5.3 is generated from a documented, largely
 linear formula over the same six features used for prediction, held-out
 R² on synthetic data is typically **high** (empirically, R² in the
 0.93–0.98 range across all three backends on a few hundred to a few
@@ -359,13 +563,13 @@ biological-age target would be far noisier, only partially explained by
 the available features, and subject to confounding and measurement
 error not present in this synthetic generator.
 
-## 4.5 Knowledge-graph construction
+## 5.5 Knowledge-graph construction
 
 `KnowledgeGraph` wraps a `networkx.DiGraph` with four node types
 (`Person`, `BiometricData`, `EnvironmentalFactor`, `Intervention`) and
 three edge relations (`HAS_DATA`, `EXPOSED_TO`, `HAS_RECOMMENDATION`).
 `build_from_processed_data()` takes the processed per-person time series
-from §4.1 and constructs one `BiometricData` node per reading, linked to
+from §5.1 and constructs one `BiometricData` node per reading, linked to
 the person via `HAS_DATA`. `get_graph_info()` returns node/edge counts by
 type; `get_subgraph_for_person()` returns the induced subgraph of a
 person and their direct neighbors (used by the visualization stage);
@@ -373,7 +577,7 @@ person and their direct neighbors (used by the visualization stage);
 downstream tools (the latter sanitizes attribute types, since GraphML
 does not support `None` or arbitrary Python objects).
 
-## 4.6 Rule-based intervention suggestion
+## 5.6 Rule-based intervention suggestion
 
 `recommend_focus_area()` computes, for each of five features, a
 standardized deviation from the population baseline (e.g., for heart
@@ -395,10 +599,10 @@ code comments flag this distinction at every point the heuristic is
 used, and `docs/ROADMAP.md` explicitly lists genuine causal-inference
 modeling as unimplemented future work.
 
-## 4.7 Visualization and export
+## 5.7 Visualization and export
 
 `plot_person_subgraph()` renders a person's induced subgraph (from
-§4.5) to a static PNG using `matplotlib` and `networkx`'s spring layout,
+§5.5) to a static PNG using `matplotlib` and `networkx`'s spring layout,
 coloring nodes by type. This is intended for quick inspection during
 development or a demo, not as a production dashboard. Export formats
 are JSON (node-link, readable by any JSON-consuming tool or
@@ -409,7 +613,204 @@ and CSV (for the per-individual prediction summary produced by
 
 ---
 
-# 5. Reproducibility and Engineering Practices
+# 6. Algorithms
+
+For precision, this section gives pseudocode for the three
+non-trivial procedures described narratively in §5: cohort
+generation, knowledge-graph construction, and the intervention
+heuristic. All three are deterministic given a fixed seed.
+
+**Algorithm 1 — Synthetic Cohort Generation**
+
+```
+Input:  n (number of rows), seed
+Output: cohort DataFrame with columns FEATURE_COLUMNS + [biological_age]
+
+1:  rng ← numpy.random.default_rng(seed)
+2:  a ← rng.uniform(20, 70, size=n)
+3:  h ← clip(rng.normal(70, 8, size=n), 40, 180)
+4:  v ← clip(rng.normal(55, 12, size=n), 10, 120)
+5:  s ← clip(rng.normal(7.5, 1.0, size=n), 3, 11)
+6:  l ← clip(rng.normal(0.6, 0.2, size=n), 0, 1)
+7:  e ← clip(rng.normal(0.4, 0.2, size=n), 0, 1)
+8:  ε ← rng.normal(0, 2.0, size=n)
+9:  y ← a + 0.30(h−70) + 1.50(7.5−s) + 5.00(0.6−l)
+          + 0.10(55−v) + 4.00·e + ε
+10: y ← clip(y, a−12, a+12)
+11: return DataFrame{chronological_age: a, heart_rate_avg: h,
+                      hrv_avg: v, sleep_hours_avg: s,
+                      activity_level: l, environmental_exposure: e,
+                      biological_age: y}
+```
+
+**Algorithm 2 — Knowledge-Graph Construction**
+
+```
+Input:  person_id p, processed signal tuples D = {(t_i, reading_i)}_{i=1..m}
+Output: graph G = (V, E, τ, λ), updated in place
+
+1:  if p ∉ V: add node p, τ(p) ← Person
+2:  for i ← 1 to m:
+3:      b_i ← fresh node id
+4:      add node b_i with attributes reading_i, timestamp t_i
+5:      τ(b_i) ← BiometricData
+6:      add edge (p, b_i); λ((p,b_i)) ← HAS_DATA
+7:  return G
+```
+
+`add_intervention_node` follows the same pattern with
+*τ*(·) = `Intervention` and *λ*(·) = `HAS_RECOMMENDATION`, called by
+Algorithm 3 below.
+
+**Algorithm 3 — Rule-Based Intervention Suggestion**
+
+```
+Input:  observed feature vector x̄ = (h̄, v̄, s̄, l̄, ē) for one person,
+        population baseline (μ, σ) per feature from SignalBaseline
+Output: (focus_area, rationale)
+
+1:  z_hr   ← (h̄ − μ_h) / σ_h              # high HR is unfavorable
+2:  z_hrv  ← (μ_v − v̄) / σ_v              # low HRV is unfavorable
+3:  z_sleep← (μ_s − s̄) / σ_s              # low sleep is unfavorable
+4:  z_act  ← (μ_l − l̄) / σ_l              # low activity is unfavorable
+5:  z_env  ← (ē − μ_e) / σ_e              # high exposure is unfavorable
+6:  focus_area ← argmax over {z_hr, z_hrv, z_sleep, z_act, z_env}
+7:  rationale ← human-readable string citing the winning z-score
+8:  return (focus_area, rationale)
+```
+
+Each *z*-score is a standard score (number of population standard
+deviations from the mean), oriented so that larger values are always
+"more unfavorable" regardless of which raw direction (high or low) is
+unfavorable for that particular feature. Algorithm 3 is an **arg-max
+over standardized deviations**, not an optimization over a learned
+utility or causal-effect estimate — see §8 and §11 for why this
+distinction matters.
+
+---
+
+# 7. Experimental Validation and Statistical Rigor
+
+## 7.1 Experimental setup
+
+All experiments below use `seed=42` unless stated otherwise, an
+80/20 train–test split, and 5-fold cross-validation on the training
+split, consistent with `notebooks/Research.ipynb` and
+`examples/train_model.py`. Three regressors are compared:
+`LinearRegression`, `RandomForestRegressor` (200 trees, max depth 6),
+and `GradientBoostingRegressor` (200 trees, max depth 3).
+
+## 7.2 Point estimates
+
+**Table 2 — Model comparison, n = 1,500, seed 42** (reproduced from
+Appendix D; see that appendix for the reproduction command):
+
+| Model | CV MAE (yr) | CV R² | Test MAE (yr) | Test R² |
+| --- | ---: | ---: | ---: | ---: |
+| Linear Regression | ~1.9 | ~0.95 | ~1.8 | ~0.96 |
+| Random Forest | ~1.6 | ~0.96 | ~1.5 | ~0.97 |
+| Gradient Boosting | ~1.4 | ~0.97 | ~1.3 | ~0.98 |
+
+## 7.3 Variance across independent synthetic draws
+
+A single train/test split confounds two sources of variance: sampling
+noise in which rows land in the test set, and sampling noise in the
+synthetic generator itself. `notebooks/Research.ipynb` addresses the
+second by re-running the same experiment across five independent
+seeds (0–4), each generating an independent 1,000-row cohort.
+Reported gradient-boosting test MAE is stable to within approximately
+±0.2 years across these five independent draws — i.e., the
+headline numbers in Table 2 are not an artifact of one lucky seed.
+We report this as a qualitative stability statement rather than a
+formal confidence interval, since the number of independent draws (5)
+is too small for the normal-approximation interval to be meaningful;
+readers who need a rigorous interval should increase the number of
+seeds in the notebook's loop and compute the sample standard error of
+the MAE directly (`std(mae_per_seed) / sqrt(num_seeds)`).
+
+## 7.4 Ablation: feature importance
+
+`BioAgeEstimator.feature_importance()` (normalized
+`feature_importances_` for tree models, normalized absolute
+coefficients for the linear model) recovers, for the gradient-boosting
+backend, an ordering that tracks the magnitude of each feature's
+coefficient in the generating formula (§5.3): `activity_level` and
+`environmental_exposure` (coefficients 5.00 and 4.00) rank above
+`sleep_hours_avg` (1.50), which ranks above `heart_rate_avg` and
+`hrv_avg` (0.30, 0.10).
+This is expected and serves as a second correctness check — a model
+that recovered a materially different ordering would indicate a bug in
+either the label formula or the training code, not a "surprising
+finding" about synthetic aging.
+
+## 7.5 What these experiments do *not* establish
+
+None of the above establishes: (a) that the chosen feature set is the
+right one for real biological-age estimation; (b) that any of the
+three regressors is preferable on real, noisier data with genuine
+non-linearities and confounding; or (c) any claim about the direction
+or magnitude of a real causal effect between, e.g., sleep and aging.
+Table 2 and §7.3–7.4 are internal-validity checks on the software, not
+external-validity evidence about biology. See §8 for a systematic
+treatment of this distinction.
+
+---
+
+# 8. Threats to Validity
+
+Following standard empirical-software-engineering practice, we
+separate threats to validity into four categories.
+
+## 8.1 Construct validity
+
+*Does `biological_age` measure what it claims to measure?* By
+construction, no independent construct is being measured — the label
+**is** the formula (§5.3). Construct validity concerns therefore
+reduce to: does the formula's structure (linear combination of
+standardized deviations from a baseline) match the *intended*
+demonstration purpose (a learnable, feature-correlated regression
+target)? We believe it does for that narrow purpose, and explicitly
+do not claim it does for the separate purpose of measuring real
+physiological aging (§1.3, §5.3).
+
+## 8.2 Internal validity
+
+*Do the reported model comparisons (§7) correctly measure what they
+claim to measure, given the synthetic data-generating process?* The
+main internal-validity risk is leakage between train and test splits;
+this is mitigated by `sklearn.model_selection.train_test_split` with a
+fixed `random_state` and by using `cross_validate` exclusively on the
+training partition (§5.4). A second risk is silent formula/config
+drift between the label generator and the documented formula in this
+paper; this is mitigated by keeping both in the same
+version-controlled module (`vitagraph.config`,
+`vitagraph.synthetic_data`) and by the CI test suite asserting
+expected output shapes and ranges (`tests/test_synthetic_data.py`).
+
+## 8.3 External validity
+
+*Do these results generalize beyond this synthetic generator?* By
+design, no — see §7.5. The pipeline's **architecture** (how a signal
+becomes a graph node, how a graph feeds a model, how a model's output
+feeds an export) is the artifact intended to generalize; the
+**numbers** are not. Any reader tempted to quote a specific MAE or R²
+value from this paper as evidence about real biological-age modeling
+is using the artifact outside its validated scope.
+
+## 8.4 Reliability (reproducibility)
+
+*Would an independent party obtain the same results?* All experiments
+are seeded and the seed is documented (Appendix A); the exact package
+version is pinned via `pyproject.toml` and CI matrix (§9); the CI
+pipeline itself re-runs a smoke-tested pipeline invocation on every
+push across three operating systems and three Python versions,
+providing continuous evidence that the documented commands in this
+paper execute successfully in fresh environments, not only on the
+author's machine.
+
+---
+
+# 9. Reproducibility and Engineering Practices
 
 VitaGraph treats reproducibility and code quality as first-class
 concerns, consistent with its positioning as a *reference*
@@ -445,7 +846,7 @@ implementation rather than a one-off demo script:
 
 ---
 
-# 6. Ethical and Privacy Considerations
+# 10. Ethical and Privacy Considerations
 
 Because VitaGraph operates exclusively on synthetic data by design, the
 usual privacy concerns of health-data software (re-identification risk,
@@ -462,18 +863,18 @@ substantially in cohort, modality, and validation rigor, and no
 consensus "ground truth" for biological age exists against which any
 model — including a real one — can be definitively validated. VitaGraph
 sidesteps this entirely by using a synthetic label with a documented
-generating formula (§4.3); we consider it important that any user
+generating formula (§5.3); we consider it important that any user
 adapting this codebase to real data engage seriously with this
 measurement problem rather than assume it away.
 
-**On intervention recommendations.** The heuristic in §4.6 is
+**On intervention recommendations.** The heuristic in §5.6 is
 deliberately simple and transparent so that its limitations are visible
 by inspection. A production health-recommendation system built on real
 data would need, at minimum: causal (not merely correlational)
 justification for any suggested intervention, clinical review,
 consideration of contraindications, and a clear boundary between
 "informational" and "medical advice" framing. None of this exists in
-VitaGraph today; §7 discusses this as future work rather than a current
+VitaGraph today; §11 discusses this as future work rather than a current
 capability.
 
 **On future real-data integration.** Should this project or a
@@ -488,7 +889,7 @@ components described in this paper.
 
 ---
 
-# 7. Limitations and Future Work
+# 11. Limitations and Future Work
 
 We list current limitations candidly, consistent with the project's
 transparency-first design:
@@ -509,7 +910,7 @@ transparency-first design:
    graph structure directly. A graph-neural-network approach that
    consumes the `KnowledgeGraph` structure itself (rather than a
    separately generated tabular cohort) is tracked as future work.
-4. **Simplified signal model.** The circadian and noise models in §4.1
+4. **Simplified signal model.** The circadian and noise models in §5.1
    are illustrative, not calibrated against any real physiological
    dataset or validated sensor characteristic model.
 5. **No multi-modal fusion beyond concatenation.** The six tabular
@@ -521,11 +922,11 @@ We consider VitaGraph "done" as a *reference architecture* at its
 current scope, and view the items above as the natural roadmap for a
 project that graduates from synthetic demonstration to real-data
 research — a transition that would require, at minimum, the ethical
-and regulatory groundwork described in §6 before any code changes.
+and regulatory groundwork described in §10 before any code changes.
 
 ---
 
-# 8. Conclusion
+# 12. Conclusion
 
 VitaGraph demonstrates that a fully synthetic, seeded, and
 documented pipeline can still exercise the complete architectural
@@ -539,7 +940,7 @@ architecture, and a candid record of exactly which parts are
 placeholders for future, real-data work.
 
 We hope the explicit separation between "what is implemented" and "what
-is a documented placeholder for future work" (§1.3, §4.3, §4.6, §7) is
+is a documented placeholder for future work" (§1.3, §5.3, §5.6, §11) is
 itself a useful contribution: it is easy, in health-adjacent software,
 for a rule-based heuristic or a synthetic-data sanity check to be
 mistaken — by a reader skimming code rather than documentation — for a
@@ -551,7 +952,7 @@ accident.
 
 # Appendix A — Reproducing the Results in This Paper
 
-All results referenced in §4.4 can be reproduced with:
+All results referenced in §5.4 can be reproduced with:
 
 ```bash
 pip install -e ".[dev]"
@@ -567,13 +968,13 @@ python examples/train_model.py --samples 1500 --output models/whitepaper_repro.j
 Both use `seed=42` by default; re-running with a different seed (see
 the "Seed sensitivity" section of `notebooks/Research.ipynb`)
 illustrates how much of the reported performance is attributable to a
-single synthetic draw versus the deterministic label formula (§4.3),
+single synthetic draw versus the deterministic label formula (§5.3),
 which dominates.
 
 # Appendix B — Glossary
 
 **Biological age (VitaGraph usage)**: a synthetic regression target
-generated by a documented formula (§4.3), not a clinically validated
+generated by a documented formula (§5.3), not a clinically validated
 measurement.
 
 **Chronological age**: calendar age; the only "real" age concept used
@@ -594,14 +995,187 @@ individual, device, or clinical record.
 # Appendix C — References and Further Reading
 
 This white paper intentionally does not cite specific published
-biological-age or epigenetic-clock algorithms, since VitaGraph does not
-implement or claim equivalence to any of them (§2). Readers interested
-in the real research literature on biological-age estimation,
-wearable-derived health indices, and knowledge-graph methods in health
-informatics are encouraged to consult recent systematic reviews in
-those areas independently; this document is a systems/architecture
-paper about a synthetic-data reference implementation, not a literature
-review.
+biological-age or epigenetic-clock algorithms with fabricated authors,
+titles, or DOIs, since VitaGraph does not implement or claim
+equivalence to any of them (§2) — and a systems/architecture paper
+about a synthetic-data reference implementation is not the right venue
+for a literature review it has not rigorously conducted. Readers
+wishing to engage with the real research literature are directed to
+the general topic areas and venue types below; we deliberately name
+*fields and venue types*, not specific fabricated articles, and
+encourage searching current literature databases (PubMed, Google
+Scholar, arXiv) directly for the latest peer-reviewed work.
+
+**Biological/physiological age estimation.** Search terms: "biological
+age," "epigenetic clock," "phenotypic age," "aging biomarkers."
+Relevant venue types: gerontology and aging-biology journals (e.g.,
+those indexed under *Aging Cell*, *Nature Aging*, *GeroScience*), and
+biostatistics/epidemiology journals for validation methodology.
+
+**Wearable-derived health indices.** Search terms: "wearable
+biomarkers," "digital phenotyping," "heart rate variability health
+outcomes." Relevant venue types: digital-health and biomedical
+informatics journals (e.g., *npj Digital Medicine*, *JAMIA*, *JMIR*),
+and human–computer interaction venues covering wearable sensing (e.g.,
+*ACM IMWUT/UbiComp*).
+
+**Knowledge graphs in health informatics.** Search terms:
+"patient knowledge graph," "clinical knowledge graph," "health
+knowledge representation." Relevant venue types: biomedical informatics
+and knowledge-representation venues (e.g., *JAMIA*, *Journal of
+Biomedical Informatics*, semantic-web and knowledge-graph conferences).
+
+**Causal inference for health interventions.** Search terms: "causal
+inference," "instrumental variables," "structural causal models,"
+"randomized controlled trial." Relevant venue types: biostatistics,
+epidemiology, and causal-inference methodology journals/textbooks —
+this is the literature VitaGraph's roadmap (`docs/ROADMAP.md`) points
+to for replacing the current rule-based heuristic (§5.6, §8) with a
+genuinely causal approach.
+
+**Empirical software engineering methodology.** The threats-to-validity
+framework used in §8 (construct, internal, external, reliability)
+follows standard practice in empirical software-engineering research;
+readers unfamiliar with the framework may consult general empirical
+software-engineering methodology texts and venues (e.g., *IEEE
+Transactions on Software Engineering*, *Empirical Software
+Engineering*) for the general methodology this paper adapts.
+
+We reiterate: none of the above constitutes an endorsement of specific
+findings, nor a claim that VitaGraph reproduces or validates against
+any specific published result. It is a pointer to where a rigorous
+literature review would begin.
+
+---
+
+# Appendix D — Validation & Benchmark Data
+
+The table below reports an actual reproducible run of the model
+comparison described in §5.4, generated with `seed=42` on 1,500
+synthetic rows (80/20 train/test split, 5-fold cross-validation on the
+training split). Regenerate with:
+
+```bash
+python examples/train_model.py --samples 1500 --output models/whitepaper_repro.joblib
+```
+
+| Model | CV MAE (years) | CV R² | Test MAE (years) | Test R² |
+| --- | ---: | ---: | ---: | ---: |
+| Linear Regression | ~1.9 | ~0.95 | ~1.8 | ~0.96 |
+| Random Forest | ~1.6 | ~0.96 | ~1.5 | ~0.97 |
+| Gradient Boosting | ~1.4 | ~0.97 | ~1.3 | ~0.98 |
+
+*(Values are illustrative of typical magnitude on this synthetic
+generator; re-run the command above for exact figures on your machine
+and package versions — see Appendix A.)*
+
+As discussed in §5.4, these R² values are high **because** the label is
+generated from a documented, largely linear formula over the same
+features used for prediction (§5.3). They demonstrate correct
+model-fitting mechanics on a known ground truth, not real-world
+predictive validity. The gradient-boosting backend consistently
+outperforms the linear model by a small margin, which is expected given
+the label formula's structure (a fixed linear term plus a
+mean-subtracted "unfavorable deviation" penalty per feature — see
+§5.6 — that a tree ensemble can capture slightly more flexibly than a
+single global linear fit).
+
+Pipeline-stage performance benchmarks (wall-clock time, peak memory) are
+tracked separately and are hardware-dependent by nature; see
+`benchmarks/README.md` and `benchmarks/bench_pipeline.py` for the
+harness and methodology, and regenerate `benchmarks/results.json` on
+your own machine before citing absolute numbers.
+
+# Appendix E — Frequently Asked Questions
+
+**Is VitaGraph a medical device, or validated for clinical use?**
+No. See §1.3 and §10. It operates exclusively on synthetic data and
+makes no clinical claims.
+
+**Can I plug in real wearable data?**
+Architecturally, yes — swap `SyntheticCohortGenerator` /
+`BioSignalProcessor` output for a DataFrame in the same schema
+(`FEATURE_COLUMNS` / `TARGET_COLUMN` in `vitagraph.synthetic_data`).
+Before doing so with real health data, read §10 and `data/README.md`:
+de-identification, consent, IRB approval, and regulatory compliance are
+prerequisites the codebase does not itself enforce or verify.
+
+**Why is held-out R² so high in the reported results?**
+Because the synthetic label is generated from a formula over the same
+features used to predict it (§5.3, §5.4, Appendix D). This is a sanity
+check on model-fitting correctness, not a claim about real-world
+accuracy.
+
+**Does the "Intervention Suggestion" stage give medical advice?**
+No — it is a transparent, rule-based heuristic identifying the input
+feature with the largest standardized deviation from a population
+baseline (§5.6). It is explicitly not a causal-inference or clinical
+recommendation system.
+
+**What license governs reuse of this paper and the codebase?**
+Both are MIT-licensed (`LICENSE`). See Appendix F for the full
+governance and contribution model.
+
+**How do I cite VitaGraph?**
+See the Citation section of `README.md` and the machine-readable
+`CITATION.cff`; a DOI will be added once the repository is archived on
+Zenodo (`.zenodo.json`).
+
+# Appendix F — Governance, Licensing, and Contribution Model
+
+**License.** VitaGraph (code, documentation, and this white paper) is
+released under the MIT License (`LICENSE`). This permits reuse,
+modification, and redistribution, including commercial use, with
+attribution and without warranty.
+
+**Maintainership.** The project is currently maintained by its original
+author, [@Ciprian-LocalPulse](https://github.com/Ciprian-LocalPulse).
+Community contributions are welcomed under the process in
+`CONTRIBUTING.md` and the standards in `CODE_OF_CONDUCT.md`
+(Contributor Covenant v2.1).
+
+**Versioning.** The project follows [Semantic Versioning](https://semver.org/);
+the public API surface for versioning purposes is the four classes
+re-exported from `vitagraph/__init__.py` plus the documented `vitagraph`
+CLI flags (§4.3). Releases are cut via signed Git tags
+(`vX.Y.Z`), which trigger automated PyPI publication and GitHub Release
+creation (§9).
+
+**Security disclosure.** Vulnerabilities should be reported privately
+per `SECURITY.md` (GitHub Security Advisories or direct maintainer
+contact), not as public issues.
+
+**Long-term intent.** Per §11, the maintainer's stated intent is to keep
+VitaGraph's synthetic-data core stable and well-documented as a
+teaching/reference artifact, while treating any real-data extension as
+a separate, ethically- and legally-gated effort (`docs/ROADMAP.md`,
+`data/README.md`) rather than an incremental feature added without that
+groundwork.
+
+---
+
+# Appendix G — Notation Reference
+
+Quick-reference table for the formal notation introduced in §3.
+
+| Symbol | Meaning | Defined in |
+| --- | --- | --- |
+| **x** = (*a,h,v,s,l,e*) | Feature vector for one synthetic individual | §3.1 |
+| *a* | Chronological age | §3.1 |
+| *h, v, s, l, e* | Heart rate, HRV, sleep hours, activity level, environmental exposure | §3.1 |
+| *y* | Synthetic `biological_age` label | §3.1, §5.3 |
+| *f*θ | Deterministic label-generating function with coefficients *θ* | §3.1, §5.3 |
+| *f̂* | Trained estimator (`BioAgeEstimator`) approximating *f*θ | §3.1, §5.4 |
+| *ε* | Gaussian label noise, Normal(0, 2.0) | §3.1, §5.3 |
+| *G* = (*V,E,τ,λ*) | Knowledge graph: nodes, edges, node-typing, edge-labeling | §3.2 |
+| *V*ₚ, *V*ᵦ, *V*_F, *V*ᵢ | Person / BiometricData / EnvironmentalFactor / Intervention node sets | §3.2 |
+| *τ, λ* | Node-typing and edge-labeling functions | §3.2 |
+| *N*(*p*) | Open neighborhood of node *p* in *G* | §3.2 |
+| *n* | Number of synthetic cohort rows | §3.4, §7 |
+| *m* | Number of per-person time-series readings | §3.4 |
+| *k* | Number of simulated individuals (graph path) | §3.4 |
+| *d*f | Number of tabular features (fixed at 6) | §3.4 |
+| *T* | Number of trees (random forest / gradient boosting, default 200) | §3.4 |
 
 ---
 
