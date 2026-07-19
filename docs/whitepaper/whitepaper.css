@@ -1,0 +1,117 @@
+@page {
+  margin: 2.2cm 2.2cm 2.4cm 2.2cm;
+}
+
+body {
+  font-family: "Liberation Serif", "DejaVu Serif", Georgia, serif;
+  font-size: 11.5pt;
+  line-height: 1.55;
+  color: #1a1a1a;
+  max-width: 100%;
+}
+
+h1, h2, h3, h4 {
+  font-family: "Liberation Sans", "DejaVu Sans", Helvetica, Arial, sans-serif;
+  color: #0f2a3d;
+  line-height: 1.25;
+}
+
+h1 {
+  font-size: 20pt;
+  border-bottom: 2.5pt solid #0f6f5c;
+  padding-bottom: 6pt;
+  margin-top: 26pt;
+  page-break-before: always;
+}
+
+/* First h1 (title block) shouldn't force a break before it */
+body > h1:first-of-type,
+div:first-of-type h1 {
+  page-break-before: avoid;
+}
+
+h2 { font-size: 14.5pt; margin-top: 18pt; color: #0f6f5c; }
+h3 { font-size: 12.5pt; margin-top: 14pt; }
+
+p { text-align: justify; }
+
+code, pre {
+  font-family: "Liberation Mono", "DejaVu Sans Mono", monospace;
+  font-size: 9.3pt;
+}
+
+pre {
+  background: #f4f6f5;
+  border: 0.75pt solid #d8ddd9;
+  border-radius: 4pt;
+  padding: 8pt 10pt;
+  white-space: pre-wrap;
+  page-break-inside: avoid;
+}
+
+code { background: #f0f2f1; padding: 1pt 3pt; border-radius: 2pt; }
+
+blockquote {
+  border-left: 3pt solid #0f6f5c;
+  margin-left: 0;
+  padding-left: 12pt;
+  color: #33403c;
+  font-style: italic;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 10pt 0;
+  font-size: 10pt;
+  page-break-inside: avoid;
+}
+
+th, td {
+  border: 0.75pt solid #c7cdc9;
+  padding: 5pt 8pt;
+  text-align: left;
+}
+
+th { background: #0f6f5c; color: white; font-family: "Liberation Sans", sans-serif; }
+tr:nth-child(even) td { background: #f6f8f7; }
+
+hr {
+  border: none;
+  border-top: 0.75pt solid #c7cdc9;
+  margin: 16pt 0;
+}
+
+a { color: #0f6f5c; text-decoration: none; }
+
+.title-block {
+  text-align: center;
+  margin-top: 4cm;
+}
+.title-block h1 {
+  border: none;
+  font-size: 27pt;
+  page-break-before: avoid;
+  margin-bottom: 4pt;
+}
+.title-block .subtitle {
+  font-family: "Liberation Sans", sans-serif;
+  font-size: 13.5pt;
+  color: #33403c;
+  margin-bottom: 30pt;
+}
+.title-block .meta {
+  font-family: "Liberation Sans", sans-serif;
+  font-size: 10.5pt;
+  color: #555;
+}
+
+#TOC {
+  page-break-before: always;
+  page-break-after: always;
+}
+#TOC ul { list-style: none; padding-left: 1em; }
+#TOC > ul { padding-left: 0; }
+#TOC a { color: #1a1a1a; }
+
+strong { color: #0f2a3d; }

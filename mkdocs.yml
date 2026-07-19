@@ -1,0 +1,80 @@
+site_name: VitaGraph
+site_description: >-
+  Reference framework for bio-signal knowledge graphs and synthetic
+  biological-age estimation (research/education use only).
+site_url: https://ciprian-localpulse.github.io/vitagraph/
+repo_url: https://github.com/Ciprian-LocalPulse/vitagraph
+repo_name: Ciprian-LocalPulse/vitagraph
+edit_uri: edit/main/docs/
+copyright: "MIT License — see LICENSE"
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: deep-orange
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: deep-orange
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.top
+    - content.code.copy
+    - content.action.edit
+    - toc.integrate
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Home: index.md
+  - Methodology: METHODOLOGY.md
+  - Architecture: architecture.md
+  - Roadmap: ROADMAP.md
+  - API Reference:
+      - Overview: api/index.md
+      - pipeline: api/pipeline.md
+      - synthetic_data: api/synthetic_data.md
+      - bio_signal_processor: api/bio_signal_processor.md
+      - knowledge_graph: api/knowledge_graph.md
+      - bio_age_estimator: api/bio_age_estimator.md
+      - visualization: api/visualization.md
+      - config: api/config.md
+      - cli: api/cli.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            merge_init_into_class: true
+            separate_signature: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - tables
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Ciprian-LocalPulse/vitagraph

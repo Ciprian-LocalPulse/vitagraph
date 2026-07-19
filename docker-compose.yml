@@ -1,0 +1,24 @@
+services:
+  vitagraph:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: vitagraph:local
+    container_name: vitagraph
+    command: ["run", "--individuals", "5", "--days", "30", "--output-dir", "/home/vitagraph/outputs"]
+    volumes:
+      - ./outputs:/home/vitagraph/outputs
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  docs:
+    image: python:3.12-slim
+    working_dir: /docs
+    volumes:
+      - .:/docs
+    command: >
+      bash -c "pip install --no-cache-dir -e . mkdocs-material 'mkdocstrings[python]' mkdocs-jupyter &&
+               mkdocs serve --dev-addr=0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    profiles: ["docs"]

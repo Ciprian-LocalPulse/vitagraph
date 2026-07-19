@@ -1,0 +1,92 @@
+<svg viewBox="0 0 900 620" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#444"/>
+    </marker>
+  </defs>
+
+  <style>
+    .box { stroke: #333; stroke-width: 1.5; rx: 10; }
+    .title { font-size: 15px; font-weight: 600; fill: #fff; }
+    .sub { font-size: 11px; fill: #f2f2f2; }
+    .edge { stroke: #444; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    .edgelabel { font-size: 11px; fill: #333; }
+  </style>
+
+  <text x="450" y="30" text-anchor="middle" font-size="20" font-weight="700" fill="#222">
+    VitaGraph — Pipeline Architecture
+  </text>
+  <text x="450" y="50" text-anchor="middle" font-size="12" fill="#666">
+    (all inputs are simulated / synthetic — see docs/METHODOLOGY.md)
+  </text>
+
+  <!-- 1. Simulated Wearables -->
+  <rect class="box" x="60" y="80" width="200" height="70" fill="#2E86AB"/>
+  <text class="title" x="160" y="108" text-anchor="middle">Simulated Wearables</text>
+  <text class="sub" x="160" y="126" text-anchor="middle">heart rate · HRV · sleep</text>
+  <text class="sub" x="160" y="140" text-anchor="middle">BioSignalProcessor</text>
+
+  <path class="edge" d="M160,150 L160,190"/>
+
+  <!-- 2. Signal Processing -->
+  <rect class="box" x="60" y="190" width="200" height="70" fill="#3E8E7E"/>
+  <text class="title" x="160" y="218" text-anchor="middle">Signal Processing</text>
+  <text class="sub" x="160" y="236" text-anchor="middle">circadian modeling, clipping,</text>
+  <text class="sub" x="160" y="250" text-anchor="middle">smoothing / de-outlier</text>
+
+  <path class="edge" d="M260,225 L340,225"/>
+
+  <!-- 3. Knowledge Graph -->
+  <rect class="box" x="340" y="190" width="220" height="70" fill="#7CB518"/>
+  <text class="title" x="450" y="218" text-anchor="middle">Knowledge Graph</text>
+  <text class="sub" x="450" y="236" text-anchor="middle">Person → BiometricData</text>
+  <text class="sub" x="450" y="250" text-anchor="middle">→ EnvironmentalFactor (networkx.DiGraph)</text>
+
+  <!-- Synthetic cohort generator feeding into training, parallel branch -->
+  <rect class="box" x="620" y="80" width="220" height="70" fill="#2E86AB"/>
+  <text class="title" x="730" y="108" text-anchor="middle">Synthetic Cohort Generator</text>
+  <text class="sub" x="730" y="126" text-anchor="middle">tabular features +</text>
+  <text class="sub" x="730" y="140" text-anchor="middle">simulated biological_age label</text>
+
+  <path class="edge" d="M730,150 L730,190"/>
+
+  <!-- 4. ML Estimator -->
+  <rect class="box" x="620" y="190" width="220" height="70" fill="#F2A541"/>
+  <text class="title" x="730" y="218" text-anchor="middle" fill="#222">ML Estimator</text>
+  <text class="sub" x="730" y="236" text-anchor="middle" fill="#333">BioAgeEstimator</text>
+  <text class="sub" x="730" y="250" text-anchor="middle" fill="#333">linear / random forest / GB regressor</text>
+
+  <path class="edge" d="M560,225 L620,225"/>
+  <path class="edge" d="M450,260 L450,300 L620,300 L620,260" />
+  <text class="edgelabel" x="500" y="295">predictions attached as node attrs</text>
+
+  <!-- 5. Rule-based Intervention -->
+  <rect class="box" x="340" y="330" width="220" height="60" fill="#C5283D"/>
+  <text class="title" x="450" y="356" text-anchor="middle">Intervention Suggestion</text>
+  <text class="sub" x="450" y="374" text-anchor="middle">rule-based focus-area heuristic</text>
+
+  <path class="edge" d="M450,260 L450,330"/>
+  <path class="edge" d="M730,260 L730,300 L560,300 L560,360 L560,360" />
+
+  <!-- 6. Visualization -->
+  <rect class="box" x="130" y="440" width="220" height="70" fill="#5B5F97"/>
+  <text class="title" x="240" y="468" text-anchor="middle">Visualization</text>
+  <text class="sub" x="240" y="486" text-anchor="middle">matplotlib + networkx spring layout</text>
+  <text class="sub" x="240" y="500" text-anchor="middle">→ PNG subgraph plot</text>
+
+  <!-- 7. Export -->
+  <rect class="box" x="450" y="440" width="220" height="70" fill="#5B5F97"/>
+  <text class="title" x="560" y="468" text-anchor="middle">Export</text>
+  <text class="sub" x="560" y="486" text-anchor="middle">JSON (node-link) · GraphML</text>
+  <text class="sub" x="560" y="500" text-anchor="middle">model .joblib + .json metadata · CSV summary</text>
+
+  <path class="edge" d="M450,390 L240,440"/>
+  <path class="edge" d="M450,390 L560,440"/>
+
+  <text x="450" y="560" text-anchor="middle" font-size="12" fill="#777">
+    CLI orchestration: vitagraph.pipeline.run_pipeline() ties every stage above together.
+  </text>
+  <text x="450" y="580" text-anchor="middle" font-size="12" fill="#777">
+    Entry points: `vitagraph run|train|predict` (see docs/api/cli.md) or the library API directly.
+  </text>
+</svg>

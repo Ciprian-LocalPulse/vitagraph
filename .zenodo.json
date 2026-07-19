@@ -1,0 +1,30 @@
+{
+  "title": "VitaGraph: A Reference Framework for Bio-Signal Knowledge Graphs and Synthetic Biological-Age Estimation",
+  "description": "VitaGraph is an open-source, MIT-licensed reference framework for simulating and studying the integration of multi-source biometric data using knowledge graphs and machine learning. It provides synthetic biometric time-series generation, a networkx-based knowledge-graph representation of person-data-environment relationships, and pluggable ML backends for biological-age regression on synthetic labels. Research/education use only; not a medical device.",
+  "creators": [
+    {
+      "name": "Plesca, Ciprian Stefan",
+      "affiliation": "Independent Researcher"
+    }
+  ],
+  "license": "MIT",
+  "upload_type": "software",
+  "access_right": "open",
+  "keywords": [
+    "knowledge-graph",
+    "biological-age",
+    "longevity",
+    "synthetic-data",
+    "health-data-science",
+    "machine-learning",
+    "reference-implementation"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/Ciprian-LocalPulse/vitagraph",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ],
+  "notes": "Enable the Zenodo-GitHub integration at https://zenodo.org/account/settings/github/ for this repository, then cut a GitHub Release (tag vX.Y.Z) to trigger automatic archiving and DOI minting. Once minted, replace the commented DOI placeholders in CITATION.cff and the DOI badge URL in README.md with the real Concept DOI."
+}

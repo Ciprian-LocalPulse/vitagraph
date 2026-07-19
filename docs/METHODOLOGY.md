@@ -23,7 +23,7 @@ VitaGraph generates synthetic time-series data for multiple individuals across d
 - Measurement noise
 - Seeded random number generation for reproducibility
 
-**Biological-age label**: A deterministic linear combination of features (formula in [`config.py`](../src/vitagraph/config.py)) with added Gaussian noise. This is **a data-generation convenience, not a biological or clinical claim**. Real biological age depends on epigenetics, genomics, metabolism, and countless other factors not modeled here.
+**Biological-age label**: A deterministic linear combination of features (formula in [`config.py`](https://github.com/Ciprian-LocalPulse/vitagraph/blob/main/src/vitagraph/config.py)) with added Gaussian noise. This is **a data-generation convenience, not a biological or clinical claim**. Real biological age depends on epigenetics, genomics, metabolism, and countless other factors not modeled here.
 
 ### 1.2 Knowledge Graph Representation
 
@@ -195,7 +195,7 @@ cohort = gen.generate(1000)  # Always the same output given seed=42
 
 ### 6.2 Documented Baselines
 
-Population-level assumptions (heart-rate mean/std, sleep hours, etc.) are centralized in [`config.py`](../src/vitagraph/config.py), making them auditable and overridable:
+Population-level assumptions (heart-rate mean/std, sleep hours, etc.) are centralized in [`config.py`](https://github.com/Ciprian-LocalPulse/vitagraph/blob/main/src/vitagraph/config.py), making them auditable and overridable:
 
 ```python
 @dataclass(frozen=True)
@@ -207,7 +207,7 @@ class SignalBaseline:
 
 ### 6.3 Explicit Formula for Biological Age
 
-The synthetic ground-truth biological-age label is computed by a documented formula in [`config.py`](../src/vitagraph/config.py), not a black box. Every coefficient is justified and overridable.
+The synthetic ground-truth biological-age label is computed by a documented formula in [`config.py`](https://github.com/Ciprian-LocalPulse/vitagraph/blob/main/src/vitagraph/config.py), not a black box. Every coefficient is justified and overridable.
 
 ### 6.4 Logging & Inspection
 

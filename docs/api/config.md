@@ -1,0 +1,3 @@
+# `vitagraph.config`
+
+::: vitagraph.config

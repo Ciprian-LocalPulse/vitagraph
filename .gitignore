@@ -37,3 +37,18 @@ outputs/
 
 # Environment variables
 .env
+
+# Benchmarks (regenerated per-machine; commit a snapshot explicitly if needed)
+benchmarks/results.json
+
+# Docs site build output
+_site/
+site/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# DVC (dataset/model versioning — see data/README.md)
+.dvc/cache
+.dvc/tmp
+.dvc/*.lock

@@ -180,7 +180,7 @@ We are actively seeking:
 2. **Clinical data partners** (hospitals, biobanks, longitudinal cohort studies)
 3. **Funding** from research foundations (NIH, European Research Council, Gates Foundation, etc.)
 4. **Industry partnerships** for wearable/genomics data integration
-5. **Community support**: Individual donors support infrastructure & development (see [DONATE.md](../DONATE.md))
+5. **Community support**: Individual donors support infrastructure & development (see [DONATE.md](https://github.com/Ciprian-LocalPulse/vitagraph/blob/main/DONATE.md))
 
 **Contact**: Ciprian Stefan Plesca (@Ciprian-LocalPulse on GitHub)
 
@@ -188,7 +188,7 @@ We are actively seeking:
 
 ## 💝 Support VitaGraph
 
-Open-source research requires sustained funding. **[Support VitaGraph →](../DONATE.md)**
+Open-source research requires sustained funding. **[Support VitaGraph →](https://github.com/Ciprian-LocalPulse/vitagraph/blob/main/DONATE.md)**
 
 Your contributions fund:
 - Cloud infrastructure & GPU compute
@@ -218,7 +218,7 @@ By 2028, VitaGraph will be considered successful if:
 We welcome feedback, feature requests, and code contributions. Please:
 
 1. Open a **GitHub Issue** to discuss a feature
-2. Check the [CONTRIBUTING.md](../CONTRIBUTING.md) guide
+2. Check the [CONTRIBUTING.md](https://github.com/Ciprian-LocalPulse/vitagraph/blob/main/CONTRIBUTING.md) guide
 3. Submit a **pull request** with tests and documentation
 
 ---

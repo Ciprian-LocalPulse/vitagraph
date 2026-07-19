@@ -50,6 +50,11 @@ dev = [
     "ruff>=0.4.0",
     "black>=24.0.0",
     "mypy>=1.8.0",
+    "pre-commit>=3.7.0",
+]
+docs = [
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.25.0",
 ]
 
 [project.urls]

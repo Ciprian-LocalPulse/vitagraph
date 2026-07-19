@@ -1,0 +1,52 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="VitaGraph Architecture" id="vitagraph-architecture">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="620" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="wearables" value="Simulated Wearables&#10;(BioSignalProcessor)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2E86AB;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="60" y="80" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="signal" value="Signal Processing&#10;circadian model, clipping" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#3E8E7E;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="60" y="190" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="graph" value="Knowledge Graph&#10;Person -&gt; BiometricData -&gt; EnvironmentalFactor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#7CB518;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="340" y="190" width="220" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cohort" value="Synthetic Cohort Generator&#10;features + biological_age label" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2E86AB;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="620" y="80" width="220" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ml" value="ML Estimator&#10;linear / random forest / gradient boosting" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2A541;fontColor=#222222;" vertex="1" parent="1">
+          <mxGeometry x="620" y="190" width="220" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="intervention" value="Intervention Suggestion&#10;rule-based focus-area heuristic" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5283D;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="340" y="330" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="viz" value="Visualization&#10;matplotlib PNG subgraph plot" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#5B5F97;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="130" y="440" width="220" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="export" value="Export&#10;JSON / GraphML / joblib+json / CSV" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#5B5F97;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="450" y="440" width="220" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="wearables" target="signal"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="signal" target="graph"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="cohort" target="ml"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="graph" target="ml" value="predictions attached as node attrs"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="graph" target="intervention"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="ml" target="intervention"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="intervention" target="viz"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="intervention" target="export"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

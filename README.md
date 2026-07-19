@@ -7,8 +7,19 @@
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)
 ![MIT License](https://img.shields.io/badge/license-MIT-green)
 ![Version 0.2.0](https://img.shields.io/badge/version-0.2.0-orange)
+[![CI](https://github.com/Ciprian-LocalPulse/vitagraph/actions/workflows/ci.yml/badge.svg)](https://github.com/Ciprian-LocalPulse/vitagraph/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/Ciprian-LocalPulse/vitagraph/actions/workflows/codeql.yml/badge.svg)](https://github.com/Ciprian-LocalPulse/vitagraph/actions/workflows/codeql.yml)
+[![Docs](https://github.com/Ciprian-LocalPulse/vitagraph/actions/workflows/docs.yml/badge.svg)](https://ciprian-localpulse.github.io/vitagraph/)
+[![codecov](https://codecov.io/gh/Ciprian-LocalPulse/vitagraph/branch/main/graph/badge.svg)](https://codecov.io/gh/Ciprian-LocalPulse/vitagraph)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![PyPI](https://img.shields.io/pypi/v/vitagraph.svg)](https://pypi.org/project/vitagraph/)
+[![Downloads](https://static.pepy.tech/badge/vitagraph)](https://pepy.tech/project/vitagraph)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.PLACEHOLDER.svg)](https://doi.org/10.5281/zenodo.PLACEHOLDER)
 [![Donate](https://img.shields.io/badge/💝-Support%20Research-ff69b4)](DONATE.md)
 [![GitHub](https://img.shields.io/badge/github-vitagraph-181717?logo=github)](https://github.com/Ciprian-LocalPulse/vitagraph)
+
+<sub>PyPI, Downloads, and DOI badges will resolve once the first `v0.2.0` tag is published (see [Releases](#-releases--versioning) and [Citation & DOI](#-citation)); CI/CodeQL/Docs/coverage badges are live against this repository.</sub>
 
 ---
 
@@ -55,7 +66,8 @@ pip install vitagraph
 
 - Python 3.10+
 - Dependencies: `numpy`, `pandas`, `networkx`, `scikit-learn`, `joblib`, `matplotlib`
-- Development: `pytest`, `pytest-cov`, `ruff`, `black`, `mypy`
+- Development (`pip install -e ".[dev]"`): `pytest`, `pytest-cov`, `ruff`, `black`, `mypy`, `pre-commit`
+- Documentation (`pip install -e ".[docs]"`): `mkdocs-material`, `mkdocstrings[python]`
 
 ---
 
@@ -94,6 +106,48 @@ vitagraph predict \
   --activity-level 0.6 \
   --environmental-exposure 0.3
 ```
+
+---
+
+## 🏛️ Architecture
+
+![VitaGraph architecture diagram](docs/architecture/architecture.png)
+
+Wearables → Signal Processing → Knowledge Graph → ML Estimator → Visualization → Export.
+Full stage-by-module breakdown, design principles, and the editable
+`.drawio` source: **[docs/architecture.md](docs/architecture.md)**.
+
+---
+
+## 🐳 Docker
+
+```bash
+# Build and run the full pipeline in a container
+docker compose up vitagraph
+
+# Or serve the documentation site locally at http://localhost:8000
+docker compose --profile docs up docs
+```
+
+Equivalent plain-Docker usage:
+
+```bash
+docker build -t vitagraph .
+docker run --rm -v "$(pwd)/outputs:/home/vitagraph/outputs" vitagraph run --individuals 5
+```
+
+---
+
+## 📓 Notebooks & Examples
+
+- **Notebooks** ([`notebooks/`](notebooks/)): `Tutorial.ipynb` (guided walkthrough),
+  `Research.ipynb` (cross-validation, learning curves, seed sensitivity),
+  `Examples.ipynb` (notebook mirror of the scripts below).
+- **Scripts** ([`examples/`](examples/)): `generate_dataset.py`, `train_model.py`,
+  `visualize_graph.py`, `cli_demo.py` — each independently runnable, see
+  [`examples/README.md`](examples/README.md).
+- **Benchmarks** ([`benchmarks/`](benchmarks/)): performance harness for every
+  pipeline stage, see [`benchmarks/README.md`](benchmarks/README.md).
 
 ---
 
@@ -190,6 +244,14 @@ print(result.knowledge_graph.get_graph_info())
 
 ```
 vitagraph/
+├── .github/
+│   ├── workflows/
+│   │   ├── ci.yml                    # lint + typecheck + tests (3 OS x 3 py) + build
+│   │   ├── codeql.yml                # CodeQL security scanning
+│   │   ├── dependency-review.yml     # Dependency review on PRs
+│   │   ├── release.yml               # Tag-triggered PyPI publish + GitHub Release
+│   │   └── docs.yml                  # MkDocs build + GitHub Pages deploy
+│   └── dependabot.yml                 # Automated dependency + Actions updates
 ├── src/vitagraph/
 │   ├── __init__.py
 │   ├── config.py                    # Centralized configuration (baselines, defaults)
@@ -209,12 +271,40 @@ vitagraph/
 │   ├── test_knowledge_graph.py
 │   ├── test_bio_age_estimator.py
 │   └── test_pipeline.py
+├── examples/                        # Runnable, independent example scripts
+│   ├── generate_dataset.py
+│   ├── train_model.py
+│   ├── visualize_graph.py
+│   └── cli_demo.py
+├── notebooks/                        # Jupyter notebooks (executed, outputs committed)
+│   ├── Tutorial.ipynb
+│   ├── Research.ipynb
+│   └── Examples.ipynb
+├── benchmarks/                       # Performance benchmark harness
+│   ├── bench_pipeline.py
+│   └── README.md
 ├── docs/
+│   ├── index.md                     # MkDocs homepage
 │   ├── METHODOLOGY.md               # Research scope & methods
 │   ├── ROADMAP.md                   # Future objectives (causal inference, GNNs, etc.)
-│   └── API.md                       # Full API reference (auto-generated from docstrings)
-├── data/                            # Place for sample anonymized datasets (if future)
+│   ├── architecture.md              # Architecture overview + diagram
+│   ├── architecture/
+│   │   ├── architecture.svg
+│   │   ├── architecture.png
+│   │   └── architecture.drawio      # Editable source (app.diagrams.net)
+│   ├── whitepaper/
+│   │   └── VitaGraph_White_Paper.md # Full research white paper (also as PDF)
+│   └── api/                         # mkdocstrings-generated API reference pages
+├── data/                            # Place for sample anonymized datasets (DVC-tracked, see data/README.md)
 ├── models/                          # Trained model artifacts (not versioned)
+├── mkdocs.yml                        # Documentation site config (MkDocs Material)
+├── Dockerfile                        # Multi-stage build for the CLI/pipeline
+├── docker-compose.yml                 # `vitagraph` + `docs` services
+├── .pre-commit-config.yaml            # ruff, black, mypy, gitleaks, hygiene hooks
+├── CITATION.cff                       # Machine-readable citation metadata
+├── .zenodo.json                       # Zenodo archiving / DOI metadata
+├── SECURITY.md                        # Vulnerability disclosure policy
+├── CODE_OF_CONDUCT.md                 # Contributor Covenant v2.1
 ├── pyproject.toml                   # PEP 517/518 build config
 ├── requirements.txt                 # Runtime dependencies
 ├── requirements-dev.txt             # Development dependencies
@@ -283,15 +373,61 @@ open htmlcov/index.html
 
 ## 📖 Documentation
 
+- **[Documentation site](https://ciprian-localpulse.github.io/vitagraph/)** (MkDocs Material, auto-deployed from `main`)
 - **[docs/METHODOLOGY.md](docs/METHODOLOGY.md)**: What VitaGraph does and does not do; research scope; privacy & ethical considerations
 - **[docs/ROADMAP.md](docs/ROADMAP.md)**: Near-term and long-term research objectives; Graph Neural Networks; causal inference
+- **[docs/architecture.md](docs/architecture.md)**: Pipeline architecture diagram + stage-by-module mapping
+- **[docs/api/](docs/api/)**: Per-module API reference (auto-generated from docstrings via mkdocstrings)
+- **[docs/whitepaper/](docs/whitepaper/)**: Full research white paper (Markdown + PDF)
 - **[CONTRIBUTING.md](CONTRIBUTING.md)**: How to report issues, submit PRs, and contribute
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)**: Community standards (Contributor Covenant v2.1)
+- **[SECURITY.md](SECURITY.md)**: Vulnerability disclosure policy and supported versions
+
+---
+
+## ✅ Code Quality & CI/CD
+
+| Tool | Purpose | Config |
+| --- | --- | --- |
+| **GitHub Actions CI** | Lint, type-check, test (3 OS × 3 Python versions), CLI smoke test, build | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
+| **CodeQL** | Static security analysis on every push/PR + weekly schedule | [`.github/workflows/codeql.yml`](.github/workflows/codeql.yml) |
+| **Dependabot** | Automated dependency + GitHub Actions update PRs | [`.github/dependabot.yml`](.github/dependabot.yml) |
+| **Dependency Review** | Flags newly introduced vulnerable/incompatible dependencies on PRs | [`.github/workflows/dependency-review.yml`](.github/workflows/dependency-review.yml) |
+| **Ruff** | Fast linting (`E, F, I, UP, B, SIM` rule sets) | [`pyproject.toml`](pyproject.toml) |
+| **Black** | Opinionated formatting, 100-char lines | [`pyproject.toml`](pyproject.toml) |
+| **Mypy** | Static type checking of `src/vitagraph` | [`pyproject.toml`](pyproject.toml) |
+| **pre-commit** | Runs ruff/black/mypy/gitleaks + hygiene checks locally, pre-push | [`.pre-commit-config.yaml`](.pre-commit-config.yaml) |
+| **pytest + pytest-cov** | Unit tests with coverage reporting (Codecov) | [`pyproject.toml`](pyproject.toml) |
+
+Set up pre-commit locally:
+
+```bash
+pip install pre-commit
+pre-commit install
+pre-commit run --all-files
+```
+
+---
+
+## 📦 Releases & Versioning
+
+VitaGraph follows [Semantic Versioning](https://semver.org/). Releases are
+cut by pushing a `vX.Y.Z` tag, which triggers
+[`.github/workflows/release.yml`](.github/workflows/release.yml) to:
+
+1. Build the sdist/wheel and verify the tag matches `pyproject.toml`'s version.
+2. Publish to PyPI via [trusted publishing](https://docs.pypi.org/trusted-publishers/) (no long-lived API tokens).
+3. Create a GitHub Release with the matching [`CHANGELOG.md`](CHANGELOG.md) section and attached artifacts.
+4. If [Zenodo–GitHub integration](https://zenodo.org/account/settings/github/) is enabled for this repo (see [`.zenodo.json`](.zenodo.json)), Zenodo automatically archives the release and mints a DOI.
 
 ---
 
 ## 🔗 Citation
 
-If you use VitaGraph in your research or teaching, please cite:
+If you use VitaGraph in your research or teaching, please cite it. Machine-readable
+metadata lives in [`CITATION.cff`](CITATION.cff) (used by GitHub's "Cite this
+repository" button and tools like Zotero); the BibTeX below is the same
+reference in a more portable format:
 
 ```bibtex
 @software{plesca2026vitagraph,
@@ -302,6 +438,13 @@ If you use VitaGraph in your research or teaching, please cite:
   note   = {Open-source research reference implementation, MIT License}
 }
 ```
+
+Once this repository is archived on Zenodo (via the
+[GitHub–Zenodo integration](https://zenodo.org/account/settings/github/),
+metadata in [`.zenodo.json`](.zenodo.json)), a Concept DOI will be minted
+and added here and to `CITATION.cff` — citing the DOI is preferred once
+available, since it resolves to an immutable, versioned archive rather
+than a mutable Git ref.
 
 ---
 
@@ -343,6 +486,8 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
 - Code style and testing requirements
 - Pull request workflow
 - Recognition in the contributors list
+
+All participants are expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 
